@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lịch Sử Đặt Phòng - Miranda Hotel</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <style>
+      .history-container {
+        padding: 100px 20px;
+        max-width: 1000px;
+        margin: auto;
+      }
+
+      /* Hỗ trợ Responsive: Cho phép bảng cuộn ngang trên mobile */
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        min-width: 600px; /* Đảm bảo bảng không quá hẹp khi cuộn */
+      }
+
+      th,
+      td {
+        padding: 15px;
+        border: 1px solid #eee;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f8f8f8;
+        color: #2c3e50;
+        white-space: nowrap;
+      }
+
+      /* Thao tác group */
+      .action-btns {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-edit,
+      .btn-delete,
+      .btn-save {
+        border: none;
+        padding: 6px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: 0.3s;
+      }
+
+      .btn-edit {
+        background: #3498db;
+        color: white;
+      }
+      .btn-edit:hover {
+        background: #2980b9;
+      }
+
+      .btn-save {
+        background: #27ae60;
+        color: white;
+        display: none;
+      }
+      .btn-save:hover {
+        background: #219150;
+      }
+
+      .btn-delete {
+        background: #e74c3c;
+        color: white;
+      }
+      .btn-delete:hover {
+        background: #c0392b;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        display: none;
+      }
+
+      .status-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        background: #f1c40f;
+        color: #fff;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav__bar">
+        <div class="nav__logo"><a href="index.html">Miranda</a></div>
+      </div>
+    </nav>
+
+    <div class="history-container">
+      <h2><i class="ri-history-line"></i> Lịch sử đặt phòng của bạn</h2>
+
+      <div class="table-responsive">
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Số điện thoại</th>
+              <th>Nội dung</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <!-- Dữ liệu sẽ đổ vào đây -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      async function loadHistory() {
+        const email = localStorage.getItem("userEmail");
+        if (!email) return;
+
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/booking-history?email=${email}`,
+          );
+          const bookings = await response.json();
+          const body = document.getElementById("history-body");
+          body.innerHTML = "";
+
+          bookings.forEach((b) => {
+            body.innerHTML += `
+              <tr data-id="${b._id}">
+                  <td>
+                      <span class="text">${b.email}</span>
+                      <input type="text" class="input-email" value="${b.email}">
+                  </td>
+                  <td>
+                      <span class="text">${b.phone}</span>
+                      <input type="text" class="input-phone" value="${b.phone}">
+                  </td>
+                  <td>${b.roomName}</td>
+                  <td><span class="status-badge">${b.status || "Đang duyệt"}</span></td>
+                  <td>
+                      <div class="action-btns">
+                        <button class="btn-edit" onclick="editRow(this)">
+                          <i class="ri-edit-line"></i> Sửa
+                        </button>
+                        <button class="btn-save" onclick="saveRow(this, '${b._id}')">
+                          <i class="ri-save-line"></i> Lưu
+                        </button>
+                        <button class="btn-delete" 
+                            onclick="deleteBooking('${b._id}')" 
+                            style="${b.status !== "Đang duyệt" ? "display: none;" : ""}">
+                            <i class="ri-delete-bin-line"></i> Xóa
+                        </button>
+                      </div>
+                  </td>
+              </tr>`;
+          });
+        } catch (err) {
+          console.error("Lỗi tải lịch sử:", err);
+        }
+      }
+
+      function editRow(btn) {
+        const row = btn.closest("tr");
+        row
+          .querySelectorAll(".text")
+          .forEach((s) => (s.style.display = "none"));
+        row
+          .querySelectorAll("input")
+          .forEach((i) => (i.style.display = "block"));
+
+        btn.style.display = "none";
+        row.querySelector(".btn-save").style.display = "flex";
+      }
+
+      async function saveRow(btn, id) {
+        const row = btn.closest("tr");
+        const newEmail = row.querySelector(".input-email").value;
+        const newPhone = row.querySelector(".input-phone").value;
+
+        const response = await fetch(
+          "http://localhost:5000/api/update-booking",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, email: newEmail, phone: newPhone }),
+          },
+        );
+
+        if (response.ok) {
+          alert("Cập nhật thành công!");
+          loadHistory(); // Load lại thay vì reload trang để trải nghiệm mượt hơn
+        }
+      }
+
+      // TÍNH NĂNG XÓA
+      async function deleteBooking(id) {
+        if (!confirm("Bạn có chắc chắn muốn xóa đơn đặt phòng này không?"))
+          return;
+
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/delete-booking/${id}`,
+            {
+              method: "DELETE",
+            },
+          );
+
+          const data = await response.json();
+          if (response.ok) {
+            alert("Đã xóa thành công!");
+            loadHistory();
+          } else {
+            alert(data.message || "Không thể xóa đơn này!");
+          }
+        } catch (err) {
+          alert("Lỗi kết nối Server!");
+        }
+      }
+
+      window.onload = loadHistory;
+    </script>
+  </body>
+</html>
