@@ -138,7 +138,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-3-flash-preview",
+  model: "gemini-3.1-flash-lite-preview",
   systemInstruction: `VAI TRÒ:
 Bạn là Miranda Assistant - Nhân viên tư vấn ảo của Hotel Miranda (Chuyên dịch vụ Homestay/Khách sạn tại Đà Lạt).
 QUY TẮC PHẢN HỒI (STRICT):
