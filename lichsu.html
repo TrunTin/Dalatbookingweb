@@ -113,11 +113,12 @@
     <nav>
       <div class="nav__bar">
         <div class="nav__logo">
-          <a href="index.html"></a>
+          <a href="index.html">
             <div class="logo nav__logo">
               <div>D</div>
               <span>ALAT<br />TRIP</span>
-            </div></a
+            </div>
+          </a>
           >
         </div>
       </div>
@@ -151,7 +152,7 @@
 
         try {
           const response = await fetch(
-            `http://localhost:5000/api/booking-history?email=${email}`,
+            `https://dalattripweb-326170003754.asia-southeast1.run.app/api/booking-history?email=${email}`,
           );
           const bookings = await response.json();
           const body = document.getElementById("history-body");
@@ -211,7 +212,7 @@
         const newPhone = row.querySelector(".input-phone").value;
 
         const response = await fetch(
-          "http://localhost:5000/api/update-booking",
+          "https://dalattripweb-326170003754.asia-southeast1.run.app/api/update-booking",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -232,7 +233,7 @@
 
         try {
           const response = await fetch(
-            `http://localhost:5000/api/delete-booking/${id}`,
+            `https://dalattripweb-326170003754.asia-southeast1.run.app/api/delete-booking/${id}`,
             {
               method: "DELETE",
             },

@@ -21,7 +21,8 @@ navLinks.addEventListener("click", (e) => {
 /* =========================================
    2. HỆ THỐNG AUTH
    ========================================= */
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL =
+  "https://dalattripweb-326170003754.asia-southeast1.run.app/api";
 
 const loginBtn = document.querySelector('a[href="#login"]');
 const signupBtn = document.querySelector('a[href="#signup"]');
@@ -207,11 +208,14 @@ async function sendMessage() {
   chatBody.scrollTop = chatBody.scrollHeight;
 
   try {
-    const response = await fetch("http://localhost:5000/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, history: chatHistory }),
-    });
+    const response = await fetch(
+      "https://dalattripweb-326170003754.asia-southeast1.run.app/api/chat",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, history: chatHistory }),
+      },
+    );
 
     const data = await response.json();
     typingIndicator.style.display = "none";
@@ -255,17 +259,21 @@ async function sendMessage() {
       if (!currentUserEmail) {
         console.warn("Chưa đăng nhập, không thể lưu lịch sử!");
       } else {
-        fetch("http://localhost:5000/api/save-booking", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userEmail: currentUserEmail,
-            email: bookingData.email || "Chưa cung cấp",
-            phone: bookingData.phone || "Chưa cung cấp",
-            // Kết hợp tên phòng và tổng tiền vào cột nội dung
-            roomName: bookingData.details || "Phòng đặt qua Miranda Assistant",
-          }),
-        })
+        fetch(
+          "https://dalattripweb-326170003754.asia-southeast1.run.app/api/save-booking",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userEmail: currentUserEmail,
+              email: bookingData.email || "Chưa cung cấp",
+              phone: bookingData.phone || "Chưa cung cấp",
+              // Kết hợp tên phòng và tổng tiền vào cột nội dung
+              roomName:
+                bookingData.details || "Phòng đặt qua Miranda Assistant",
+            }),
+          },
+        )
           .then(() => {
             console.log("Đã lưu lịch sử!");
             // Sau khi lưu xong, xóa dữ liệu trong bộ nhớ tạm của lượt chat này

@@ -187,7 +187,7 @@ app.post("/api/chat", async (req, res) => {
         Phòng trống: ${loc.availableRooms}
         Địa chỉ: ${loc.address}
         Mô tả: ${loc.description || "Đang cập nhật"}
-        Link_Ảnh: ${loc.imageUrl || "None"}`,
+        imageUrl: ${loc.imageUrl || "None"}`,
       )
       .join("\n---\n");
     // 2. Khởi tạo phiên chat có lịch sử (Memory)
