@@ -21,4 +21,4 @@ EXPOSE 8080
 
 # Bước 7: Lệnh để khởi chạy ứng dụng
 # Đảm bảo file chính của bạn là app.js, nếu là server.js thì hãy đổi lại
-CMD [ "node", "app.js" ]
+CMD [ "node", "server/app.js" ]
