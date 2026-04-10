@@ -278,7 +278,7 @@ app.delete("/api/delete-booking/:id", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server đang chạy trên cổng ${PORT}`);

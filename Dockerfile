@@ -1,5 +1,5 @@
 # Bước 1: Sử dụng Node.js bản chính thức (phiên bản 18 hoặc 20 đều tốt)
-FROM node:18-slim
+FROM node:20-slim
 
 # Bước 2: Tạo thư mục làm việc bên trong container
 WORKDIR /usr/src/app
