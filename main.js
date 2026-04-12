@@ -127,7 +127,7 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
     if (response.ok) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.user.fullname);
-      localStorage.setItem("userEmail", data.user.email); // Lưu email để dùng cho lịch sử
+      localStorage.setItem("userEmail", data.user.email);
       authModal.classList.remove("show");
       updateUIOnLogin(data.user.fullname);
     } else {
@@ -146,7 +146,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 /* =========================================
-   3. CHAT WIDGET LOGIC (XỬ LÝ LƯU BOOKING)
+   3. CHAT WIDGET LOGIC
    ========================================= */
 const chatBubble = document.getElementById("chat-bubble");
 const chatWindow = document.getElementById("chat-window");
@@ -161,6 +161,7 @@ const imageModalImg = document.getElementById("image-modal-img");
 const imageModalClose = document.getElementById("image-modal-close");
 
 let chatHistory = [];
+let isBookingProcessing = false;
 
 function openImageZoom(src) {
   if (imageModal && imageModalImg) {
@@ -222,13 +223,12 @@ async function sendMessage() {
 
     let botReply = data.reply || "Xin lỗi, tôi gặp trục trặc.";
 
-    // --- XỬ LÝ LỌC DỮ LIỆU BOOKING ẨN TỪ AI ---
+    // --- XỬ LÝ LỌC DỮ LIỆU BOOKING ẨN ---
     let bookingData = null;
     const dataMatch = botReply.match(/\[BOOKING_DATA:\s*({.*?})\]/);
     if (dataMatch) {
       try {
         bookingData = JSON.parse(dataMatch[1]);
-        // Xóa đoạn mã ẩn để khách không thấy text JSON
         botReply = botReply.replace(dataMatch[0], "").trim();
       } catch (e) {
         console.error("Lỗi phân tích dữ liệu đặt phòng");
@@ -254,10 +254,14 @@ async function sendMessage() {
     chatBody.insertBefore(botMsg, typingIndicator);
 
     // --- PHẦN LƯU BOOKING TỰ ĐỘNG ---
-    if (bookingData) {
+    if (bookingData && !isBookingProcessing) {
+      isBookingProcessing = true;
       const currentUserEmail = localStorage.getItem("userEmail");
+
       if (!currentUserEmail) {
         console.warn("Chưa đăng nhập, không thể lưu lịch sử!");
+        isBookingProcessing = false;
+        bookingData = null; // Reset
       } else {
         fetch(
           "https://dalattripweb-326170003754.asia-southeast1.run.app/api/save-booking",
@@ -268,22 +272,25 @@ async function sendMessage() {
               userEmail: currentUserEmail,
               email: bookingData.email || "Chưa cung cấp",
               phone: bookingData.phone || "Chưa cung cấp",
-              // Kết hợp tên phòng và tổng tiền vào cột nội dung
-              roomName:
-                bookingData.details || "Phòng đặt qua Miranda Assistant",
+              roomName: bookingData.details || "Phòng đặt qua DALAT TRIP AI",
             }),
           },
         )
           .then(() => {
-            console.log("Đã lưu lịch sử!");
-            // Sau khi lưu xong, xóa dữ liệu trong bộ nhớ tạm của lượt chat này
-            // để tránh trường hợp lưu lặp lại nếu có lỗi logic
-            bookingData = null;
+            console.log("Đã lưu lịch sử thành công!");
+            bookingData = null; // RESET SAU KHI LƯU THÀNH CÔNG
           })
-          .catch((err) => console.error("Lỗi lưu booking:", err));
+          .catch((err) => console.error("Lỗi lưu booking:", err))
+          .finally(() => {
+            isBookingProcessing = false;
+            bookingData = null; // ĐẢM BẢO LUÔN RESET
+          });
       }
+    } else {
+      bookingData = null; // ĐẢM BẢO LUÔN RESET NẾU KHÔNG CÓ DATA
     }
 
+    // ĐẨY VÀO LỊCH SỬ DẠNG SẠCH
     chatHistory.push({ role: "user", parts: [{ text: text }] });
     chatHistory.push({ role: "model", parts: [{ text: botReply }] });
     chatBody.scrollTop = chatBody.scrollHeight;
