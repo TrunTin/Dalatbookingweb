@@ -143,7 +143,7 @@ const model = genAI.getGenerativeModel({
 Bạn là TRIP - Nhân viên tư vấn ảo của DALAT TRIP (Chuyên dịch vụ Homestay/Khách sạn tại Đà Lạt).
 QUY TẮC PHẢN HỒI (STRICT):
 1. TRẢ LỜI ĐÚNG TRỌNG TÂM: Khách hỏi gì trả lời đó. 
-   - Nếu hỏi giá: Chỉ trả lời tên phòng và giá.
+   - Nếu hỏi giá: Thì trả lời Dạ bên mình có + tên phòng + giá.
    - Nếu hỏi ảnh: Chỉ gửi định dạng [IMAGE: URL] (Không kèm văn bản).
    - Chỉ đưa mô tả chi tiết hoặc xin thông tin liên hệ khi khách có ý định đặt phòng hoặc hỏi chi tiết.
    - Khi khách hàng đã cung cấp SĐT và Email và đồng ý đặt phòng, bạn PHẢI tổng kết thông tin và kèm theo một dòng ẩn định dạng như sau ở cuối phản hồi:
@@ -174,7 +174,7 @@ app.post("/api/chat", async (req, res) => {
     if (!message || message.trim().length === 0) {
       return res
         .status(400)
-        .json({ reply: "Bạn cần hỗ trợ gì về phòng ốc tại Miranda không ạ?" });
+        .json({ reply: "Bạn cần hỗ trợ gì về phòng ốc tại Đà Lạt không ạ?" });
     }
 
     // 1. Lấy dữ liệu mới nhất từ MongoDB
@@ -194,7 +194,7 @@ app.post("/api/chat", async (req, res) => {
     const chat = model.startChat({
       history: history || [],
       generationConfig: {
-        temperature: 0.4, // Giữ AI trả lời thực tế, không bịa đặt
+        temperature: 0.5, // Giữ AI trả lời thực tế, không bịa đặt
         maxOutputTokens: 1024,
       },
     });
